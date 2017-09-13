@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>TinyApp</title>
+</head>
+
+<body>
+
+  <header>
+    <% include partials/_header %>
+  </header>
+
+ <p>
+  <ul>
+    <% for(var url in urls) { %>
+      <li>
+        <%= url %> <%= urls[url] %>
+        <form method="POST" action="/urls/<%= url %>/delete">
+          <button type="submit">Delete</button>
+        </form>
+        <a href="http://www.localhost:8080/urls/<%= url %>"> Edit </a>
+      </li>
+    <% } %>
+  </ul>
+ </p>
+
+ <a href= "">Click to shorten URL</a>
+
+</body>
+
+</html>
