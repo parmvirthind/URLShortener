@@ -1,8 +1,11 @@
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080;
+var cookieParser = require('cookie-parser');
+
 
 app.set("view engine", "ejs");
+app.use(cookieParser());
 
 function generateRandomString() {
   var randomID = "";
@@ -37,16 +40,17 @@ app.get("/hello", (request, response) => {
 });
 
 app.get("/urls", (request, response) => {
-  let templateVars = {urls: urlDatabase};
+  let templateVars = {urls: urlDatabase, username: request.cookies["username"]};
   response.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (request, response) => {
-  response.render("urls_new");
+  let templateVars = {username: request.cookies["username"]};
+  response.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = {shortURL: request.params.id, longURL: urlDatabase[request.params.id]};
+  let templateVars = {shortURL: request.params.id, longURL: urlDatabase[request.params.id], username: request.cookies["username"]};
   response.render("urls_show", templateVars);
 });
 
@@ -71,7 +75,16 @@ app.post("/urls/:id/delete", (request, response) => {
 app.post("/urls/:id/update", (request, response) => {
   let updatedURL = request.body.longURL;
   urlDatabase[request.params.id] = updatedURL
-  console.log(urlDatabase);
+  response.redirect(`/urls`);
+})
+
+app.post("/login", (request, response) => {
+  response.cookie("username", request.body.username);
+  response.redirect(`/urls`);
+})
+
+app.post("/logout", (request, response) => {
+  response.clearCookie("username");
   response.redirect(`/urls`);
 })
 
