@@ -22,6 +22,28 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "andy": {
+    id: "andy",
+    email: "andy@gmail.com",
+    password: "andyiscool"
+  },
+  "mijung": {
+    id: "mijung",
+    email: "mijung@gmail.com",
+    password: "mijungiscool"
+  }
+}
+
+app.use(function(request, response, next) {
+  response.locals = {
+
+    user: {},
+    password: request.cookies["password"],
+    id: request.cookies["user_id"]
+  };
+  next();
+});
 
 
 const bodyParser = require("body-parser");
@@ -30,6 +52,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get("/", (request, response) => {
   response.end("Hello!");
 });
+
+app.get("/register", (request, response) => {
+  response.render('urls_registration');
+})
+
+app.get("/login", (request, response) => {
+  response.render('urls_login');
+})
 
 app.get("/urls.json", (request, response) => {
   response.json(urlDatabase);
@@ -40,17 +70,19 @@ app.get("/hello", (request, response) => {
 });
 
 app.get("/urls", (request, response) => {
-  let templateVars = {urls: urlDatabase, username: request.cookies["username"]};
+  let templateVars = {
+    urls: urlDatabase,
+    user: users[response.locals.id]
+  };
   response.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (request, response) => {
-  let templateVars = {username: request.cookies["username"]};
-  response.render("urls_new", templateVars);
+  response.render("urls_new");
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = {shortURL: request.params.id, longURL: urlDatabase[request.params.id], username: request.cookies["username"]};
+  let templateVars = {shortURL: request.params.id, longURL: urlDatabase[request.params.id]};
   response.render("urls_show", templateVars);
 });
 
@@ -79,17 +111,52 @@ app.post("/urls/:id/update", (request, response) => {
 })
 
 app.post("/login", (request, response) => {
-  response.cookie("username", request.body.username);
-  response.redirect(`/urls`);
+  let email = request.body.email;
+  let password = request.body.password;
+
+  for(i in users) {
+    if(email === users[i].email) {
+      if(password === users[i].password) {
+        let id = users[i].id;
+        console.log(users);
+        response.cookie("user_id", id);
+        response.redirect(`/urls`);
+        return;
+      }
+    }
+  }
+  response.status(403).send("Forbidden");
+  return;
 })
 
 app.post("/logout", (request, response) => {
-  response.clearCookie("username");
+  response.clearCookie("user_id");
+  response.redirect(`/login`);
+})
+
+app.post("/register", (request, response) => {
+  let id = generateRandomString();
+  let email = request.body.email;
+  let password = request.body.password;
+
+  if(email === "" || password === "") {
+    response.status(400).send("Bad Request");
+    return;
+  }
+  for(i in users) {
+    if(email === users[i].email) {
+      response.status(400).send("Bad Request");
+      return;
+    }
+  }
+  users[id] = {id, email, password};
+  response.cookie("user_id", id);
   response.redirect(`/urls`);
 })
 
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
 
 
