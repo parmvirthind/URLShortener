@@ -10,22 +10,27 @@
   <header>
     <% include partials/_header %>
   </header>
+<% if(id === undefined) { %>
+<p>Please login first!</p>
+<% } else { %>
 
- <p>
-  <ul>
-    <% for(var url in urls) { %>
-      <li>
-        <%= url %> <%= urls[url] %>
-        <form method="POST" action="/urls/<%= url %>/delete">
-          <button type="submit">Delete</button>
-        </form>
-        <a href="http://www.localhost:8080/urls/<%= url %>"> Edit </a>
-      </li>
-    <% } %>
-  </ul>
- </p>
+  <p>
+    <ul>
+      <% for(var index in urls) { %>
+        <li>
+          <%= index %> <%= urls[index]["url"] %> <%= urls[index]["user_id"] %>
+          <form method="POST" action="/urls/<%= index %>/delete">
+            <button type="submit">Delete</button>
+          </form>
+          <a href="/urls/<%= index %>"> Edit </a>
+        </li>
+      <% } %>
+    </ul>
+  </p>
 
- <a href= "">Click to shorten URL</a>
+ <a href= "/urls/new">Click to shorten URL</a>
+
+ <% } %>
 
 </body>
 

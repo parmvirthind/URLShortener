@@ -11,18 +11,27 @@
     <% include partials/_header %>
   </header>
 
-  <p>
-  <%= shortURL %>
-  <%= longURL %>
- </p>
+  <% if(id === undefined) { %>
+    <p>Please Login First!</p>
+  <% } else if(id !== urlID) { %>
+  <% console.log(urlID); %>
 
- <form action="/urls/<%= shortURL %>/update" method="POST" style="margin:150px;">
-    <label for="longURL">Enter updated URL:</label>
-    <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-    <input type="submit" value="Update">
-  </form>
+    <p>This URL does not belong to you! </p>
+  <% } else { %>
+    <p>
+    <%= shortURL %>
+    <%= longURL %>
+    </p>
 
- <a href= "">Click to shorten URL</a>
+    <form action="/urls/<%= shortURL %>/update" method="POST" style="margin:150px;">
+      <label for="longURL">Enter updated URL:</label>
+      <input id="longURL" type="text" name="longURL" value="http://" style="width: 300px">
+      <input type="submit" value="Update">
+    </form>
+
+    <a href= "">Click to shorten URL</a>
+
+  <% } %>
 
 </body>
 

@@ -6,7 +6,8 @@
 <body>
   <h1>TinyApp</h1>
 
-  <% if(user){ %>
+  <% if(id){ %>
+      <p><%= email%></p>
       <form action="/logout" method="POST">
         <button type="submit">Logout</button>
       </form>
